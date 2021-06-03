@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import './registerServiceWorker'
+import './registerFirebaseConfig'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
@@ -20,6 +21,13 @@ import AppSheet from '@/layout/AppSheet'
 Vue.component('app-main', AppMain)
 Vue.component('app-container', AppContainer)
 Vue.component('app-sheet', AppSheet)
+
+// VueToast init
+import VueToast from 'vue-toast-notification';
+import 'vue-toast-notification/dist/theme-sugar.css';
+Vue.use(VueToast);
+
+
 
 new Vue({
   router,

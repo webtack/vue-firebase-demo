@@ -12,10 +12,12 @@
     "@babel/polyfill": "^7.4.4",
     "@mdi/font": "5.9.55",
     "core-js": "^3.6.5",
+    "firebase": "^8.6.3",
     "register-service-worker": "^1.7.1",
     "roboto-fontface": "*",
     "vue": "^2.6.11",
     "vue-router": "^3.2.0",
+    "vue-toast-notification": "^0.6.2",
     "vuetify": "^2.4.0",
     "vuex": "^3.4.0"
   },
