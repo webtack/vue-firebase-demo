@@ -96,7 +96,7 @@ export default {
 		getProducts(filters) {
 			this.loading = true
             
-            if(!this.showFilters) {
+            if(this.user.data && !this.showFilters) {
 				filters = {likedBy: this.user.data.uid}
             }
 
@@ -109,7 +109,9 @@ export default {
 						})
 						this.products = null
 						this.products = _.concat([], collection)
-						this.$store.dispatch('products/fetchCountLikedProducts', this.user.data.uid)
+                        
+                        if(this.user.data)
+						    this.$store.dispatch('products/fetchCountLikedProducts', this.user.data.uid)
 
 						this.loading = false
 					})
