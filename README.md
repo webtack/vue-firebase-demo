@@ -1,7 +1,7 @@
 # vue-firebase-demo
 
 ## Projec demo
-### You can see [live demo](https://vue-firebase-demo.webtochka.net) of the project
+### You can see [live demo](https://bit.ly/34QBlWk) of the project
 
 ## Project setup
 ### Copy env.example to .env
