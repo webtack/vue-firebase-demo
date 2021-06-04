@@ -1,8 +1,10 @@
 <template>
     <div class="search-form">
         <v-row >
-            <v-col cols="12" md="6">
+            <v-col cols="12" md="9">
                 <v-text-field
+                    v-model="name"
+                    clearable
                     outlined
                     dense
                     hide-details
@@ -10,23 +12,13 @@
                     placeholder="Serach product by name"
                     background-color="white"
                     :color="color"
+                    @click:clear="onClear"
                 ></v-text-field>
             </v-col>
-            <v-col cols="12" md="4">
-                <v-text-field
-                    outlined
-                    dense
-                    hide-details
-                    prepend-inner-icon="mdi-map-marker"
-                    placeholder="Location"
-                    background-color="white"
-                    :color="color"
-                >
-                </v-text-field>
-            </v-col>
-            <v-col cols="12" md="2">
+            <v-col cols="12" md="3">
                 <v-btn
-                    dark
+                    :disabled="!canSearch"
+                    :dark="dark"
                     :color="color"
                     class="search-form__submit"
                     @click="onSearch"
@@ -46,17 +38,30 @@ export default {
 	    color: {
 	    	type: String,
             default: 'primary'
-        }	
+        },
+	    dark: {
+		    type: Boolean,
+		    default: true
+	    }
     },
     data() {
 	    return {
-	    	
+	    	name: null,
         }	
     },
+	computed: {
+        canSearch() {
+			return !!this.name
+        }
+	},
     methods: {
+	    onClear() {
+		    this.name = null
+		    this.onSearch()
+	    },
 		onSearch() {
-			console.log('SearchForm.onSearch')
-            this.$emit('search')
+			this.$emit('search', {name: this.name})
+			this.name = null            
         }
     }
 }

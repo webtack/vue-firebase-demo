@@ -1,5 +1,5 @@
 <template>
-    <app-main>
+    <app-main :loading="loading">
         <app-container centerable>
             <app-sheet>
                 <v-form
@@ -72,10 +72,13 @@
 </template>
 
 <script>
+import { login } from '@/api/user'
+import {ToastNotification} from '@/services/Notifications'
 
 export default {
 	name: 'Login',
 	data: () => ({
+        loading: false,
 		valid: true,
 		show1: false,
 		show2: false,
@@ -111,7 +114,19 @@ export default {
 				password: this.password
 			}
 			
-			console.log('Login', payload)
+			login(payload)
+					.then(data => {
+						this.$router.replace({ name: "sell.list" })
+					})
+					.catch(err => {
+						this.loading = false
+
+						//
+						new ToastNotification({
+							message: err.message,
+							type: ToastNotification.type.error,
+						})
+					})
 		},
 	}
 }

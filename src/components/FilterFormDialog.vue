@@ -18,7 +18,7 @@
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text class="mt-2 pa-3">
-                <filter-form></filter-form>
+                <filter-form @filter="filterHandler"></filter-form>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
@@ -46,5 +46,11 @@ export default {
 			dialog: false,
 		}
 	},
+	methods: {
+		filterHandler(filters) {
+			this.dialog = false
+			this.$emit('filter', filters)
+		}
+	}
 }
 </script>

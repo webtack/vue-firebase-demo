@@ -7,10 +7,9 @@
         <v-col
             v-for="item in items"
             :key="item.id"
-            lg="3"
             md="4"
             sm="6"
-            cols="8"
+            cols="10"
             offset-sm="0"
             align-self="center"
             class="pa-2 sell-items-col"
@@ -41,10 +40,10 @@ export default {
     },
     methods: {
 	    likeHandler(id) {
-	    	console.log('SellItems.likeHandler', id)
+            this.$emit('like', id)
         },
 	    dislikeHandler(id) {
-		    console.log('SellItems.dislikeHandler', id)
+		    this.$emit('dislike', id)
 	    }
     }
 }

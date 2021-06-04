@@ -1,5 +1,5 @@
 <template>
-    <app-main>
+    <app-main :loading="loading">
         <app-container centerable>
             <app-sheet
             >
@@ -97,10 +97,13 @@
 </template>
 
 <script>
+import {ToastNotification} from '@/services/Notifications'
+import { register } from '@/api/user'
 
 export default {
 	name: 'Register',
 	data: () => ({
+        loading: false,
 		valid: true,
 		show1: false,
 		show2: false,
@@ -157,15 +160,37 @@ export default {
 
 			const payload = {
 				name: this.name,
-				surname: this.surname,
 				email: this.email,
-				password: this.password,
-				country: this.country,
-				birthDate: this.birthDate,
-				policy: this.email
+				password: this.password
 			}
 
-			console.log('register', payload)
+			register(payload)
+					.then(data => {
+						data.user
+								.updateProfile({
+									displayName: payload.name
+								})
+								.then(data => {
+									new ToastNotification({
+										message: 'You have been registered successfully. You can log in by your email and password.',
+										type: ToastNotification.type.success,
+									})
+                                    
+                                    this.$router.replace({name: 'login'})
+                                })
+                        
+                        this.loading = false
+					})
+					.catch(err => {
+
+						this.loading = false
+						
+						//
+						new ToastNotification({
+							message: err.message,
+							type: ToastNotification.type.error,
+						})
+					});
 		}
 	}
 }

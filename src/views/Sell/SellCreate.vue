@@ -1,5 +1,5 @@
 <template>
-    <app-main dark>
+    <app-main dark :loading="loading">
         <app-container maxWidth="1136">
             <app-sheet padding="6">
                 <v-row no-gutters justify="center">
@@ -24,20 +24,40 @@
                                 ></v-text-field>
                             </div>
                             <div class="p-sell-create-form__field">
-                                <label class="text--secondary" for="location">Location <span class="red--text">*</span></label>
+                                <label class="text--secondary" for="location">Category <span class="red--text">*</span></label>
                                 <v-select
-                                    id="location"
-                                    ref="location"
-                                    v-model="location"
-                                    :rules="locationRules"
-                                    placeholder="For example: Los Angeles, CA"
+                                    id="category"
+                                    ref="category"
+                                    v-model="category"
+                                    :rules="categoryRules"
+                                    :items="categories"
+                                    item-value="id"
+                                    item-text="label"
+                                    placeholder="Choose category"
                                     outlined
                                     required
                                     background-color="input-bg"
                                 ></v-select>
                             </div>
                             <div class="p-sell-create-form__field">
-                                <label class="text--secondary" for="description">Description <span class="red--text">*</span></label>
+                                <label class="text--secondary" for="location">Location <span class="red--text">*</span></label>
+                                <v-select
+                                    id="location"
+                                    ref="location"
+                                    v-model="location"
+                                    :rules="locationRules"
+                                    :items="locations"
+                                    item-value="id"
+                                    item-text="label"
+                                    placeholder="Choose location"
+                                    outlined
+                                    required
+                                    background-color="input-bg"
+                                ></v-select>
+                            </div>
+                            <div class="p-sell-create-form__field">
+                                <label class="text--secondary" for="description">Description <span
+                                    class="red--text">*</span></label>
                                 <v-textarea
                                     id="description"
                                     ref="description"
@@ -50,7 +70,8 @@
                                 ></v-textarea>
                             </div>
                             <div class="p-sell-create-form__field">
-                                <label class="text--secondary" for="preview">Preview <span class="red--text">*</span></label>
+                                <label class="text--secondary" for="preview">Preview <span
+                                    class="red--text">*</span></label>
                                 <v-file-input
                                     id="preview"
                                     ref="preview"
@@ -64,7 +85,8 @@
                                 ></v-file-input>
                             </div>
                             <div class="p-sell-create-form__field">
-                                <label class="text--secondary" for="price">Price <span class="red--text">*</span></label>
+                                <label class="text--secondary" for="price">Price <span
+                                    class="red--text">*</span></label>
                                 <v-text-field
                                     id="price"
                                     ref="price"
@@ -95,14 +117,26 @@
 </template>
 
 <script>
+import {addProduct} from '@/api/products'
+import {ToastNotification} from '@/services/Notifications'
+import {fireStorage} from '@/registerFirebaseConfig'
+import _ from 'lodash'
+
+function circumference(v) {
+	return parseFloat(v) * 2.0 * Math.PI;
+}
 
 export default {
 	name: 'SellCreate',
 	data: () => ({
-        loading: false,
+		loading: false,
 		valid: true,
 		name: null,
 		nameRules: [
+			v => !!v || 'The field is required'
+		],
+		category: null,
+		categoryRules: [
 			v => !!v || 'The field is required'
 		],
 		location: null,
@@ -119,34 +153,105 @@ export default {
 		],
 		price: null,
 		priceRules: [
-			v => !!v || 'The field is required'
+			v => !!v || 'The field is required',
+			v => /^([0-9]+)\.([0-9]{2})$/.test(v) || "The value must be a float number",
 		],
-        
-        
 	}),
+	computed: {
+		categories() {
+			return this.$store.getters.categories
+		},
+		locations() {
+			return this.$store.getters.locations
+		}
+	},
 	methods: {
-		validate () {
+		validate() {
 			this.$refs.form.validate()
 
-			if(this.valid) {
-				this.create()
+			if (this.valid) {
+				this.createHandler()
 			}
 		},
-		// Logging in
-		async create() {
+		createHandler() {
 			// Loading
-			this.loading = true;
+			this.loading = true
+
+			const file = this.preview
 
 			const payload = {
 				name: this.name,
 				location: this.location,
+				category: this.category,
 				description: this.description,
-				preview: this.preview,
-				price: this.price
+				preview: null,
+				price: this.price,
+				liked: false
 			}
 
-			console.log('create', payload)
+			this.uploadPreview(this.preview)
+					.then((snapshot) => {
+						snapshot.ref.getDownloadURL()
+								.then((downloadURL) => {
+									payload.preview = downloadURL
+                                    
+                                    return payload
+								})
+                                .then(this.createProduct)
+								.catch((error) => {
+									this.loading = false
+
+									//
+									new ToastNotification({
+										message: error.message,
+										type: ToastNotification.type.error,
+									})
+								})
+					})
+					.catch((error) => {
+						this.loading = false
+						//
+						new ToastNotification({
+							message: error.message,
+							type: ToastNotification.type.error,
+						})
+					})
+
+
 		},
+		uploadPreview(file) {
+			let ref = fireStorage.ref();
+
+			// Create the file metadata
+			let metadata = {
+				contentType: file.type
+			}
+
+			return ref.child('images/' + file.name).put(file, metadata)
+		},
+		createProduct(payload) {
+			
+			addProduct(payload)
+					.then(() => {
+						this.loading = false
+
+						new ToastNotification({
+							message: "Document successfully written!",
+							type: ToastNotification.type.success,
+						})
+
+						this.$router.push({name: 'sell.list'})
+					})
+					.catch((error) => {
+						this.loading = false
+
+						//
+						new ToastNotification({
+							message: error.message,
+							type: ToastNotification.type.error,
+						})
+					})
+		}
 	}
 }
 

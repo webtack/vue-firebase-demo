@@ -15,12 +15,15 @@
                 ></sell-favorite-action>
             </div>
             <div class="subtitle-1">{{ item.name }}</div>
-            <h3 class="">{{ item.price }}</h3>
+            <div class="caption"><b>Category:</b> {{ resolveCategory(item.category) }}</div>
+            <div class="caption"><b>Location:</b> {{ resolveLocation(item.location) }}</div>
+            <div class="title mt-2"><b>Price:</b> {{ item.price }}</div>
         </v-card-text>
     </v-card>
 </template>
 
 <script>
+import _ from 'lodash'
 import SellFavoriteAction from './SellFavoriteAction.vue'
 
 export default {
@@ -32,6 +35,14 @@ export default {
             required: true
         }
     },
+	computed: {
+		categories() {
+			return this.$store.getters.categories
+		},
+		locations() {
+			return this.$store.getters.locations
+		}
+	},
     methods: {
 	    likeHandler() {
 	    	if(this.item.liked) {
@@ -39,7 +50,13 @@ export default {
             } else {
 			    this.$emit('like', this.item.id)
             }
-        }
+        },
+        resolveLocation(id) {
+	        return _.find(this.locations, {id: id}).label
+        },
+	    resolveCategory(id) {
+		    return _.find(this.categories, {id: id}).label
+	    }
     }
 }
 

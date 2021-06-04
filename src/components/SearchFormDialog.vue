@@ -18,7 +18,11 @@
             </v-card-title>
             <v-divider></v-divider>
             <v-card-text class="mt-6">
-                <search-form></search-form>
+                <search-form
+                    color="primary"
+                    :dark="false"
+                    @search="searchHandler"
+                ></search-form>
             </v-card-text>
             <v-divider></v-divider>
             <v-card-actions>
@@ -46,5 +50,11 @@ export default {
 			dialog: false,
 		}
 	},
+    methods: {
+	    searchHandler(filters) {
+	    	this.$emit('search', filters)
+            this.dialog = false
+        }
+    }
 }
 </script>

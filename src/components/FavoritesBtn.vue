@@ -1,12 +1,12 @@
 <template>
     <v-btn
         v-if="auth.can('sell.favorites')"
+        icon
         fab
-        dark
         small
         elevation="2"
         color="white"
-        @click="onClickHandler"
+        :to="{name: 'sell.favorites'}"
     >
         <v-icon color="primary">{{ icon }}</v-icon>
     </v-btn>
@@ -17,25 +17,22 @@ import Auth from '@/services/Auth'
 
 export default {
 	name: 'SellFavoriteAction',
-    props: {
-		liked: {
-			type: Boolean,
-            required: true
-        }
-    },
-    computed: {
-		icon() {
-			return this.liked ? 'mdi-heart' : 'mdi-heart-outline'
+	computed: {
+		liked() {
+		    return this.$store.getters.liked	
         },
-	    auth() {
-		    return Auth
-	    }
-    },
-    methods: {
-	    onClickHandler() {
-			this.$emit('onClick')
+		icon() {
+			return this.liked > 0 ? 'mdi-heart' : 'mdi-heart-outline'
+		},
+        auth() {
+			return Auth
         }
-    }
+	},
+	methods: {
+		onClickHandler() {
+			this.$router.push({name: 'sell.favorites'})
+		}
+	}
 }
 
 </script>

@@ -1,57 +1,78 @@
+import Vue from 'vue'
+import { getLocations, getCategories, getLikedProducts } from '@/api/products'
+import {ToastNotification} from '@/services/Notifications'
+
 const state = {
-	items: [
-		{
-			id: 1,
-			name: 'Item name',
-			preview: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-			liked: false,
-			price: '575.09'
-		},
-		{
-			id: 2,
-			name: 'Item name',
-			preview: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-			liked: true,
-			price: '575.09'
-		},
-		{
-			id: 3,
-			name: 'Item name',
-			preview: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-			liked: false,
-			price: '575.09'
-		},
-		{
-			id: 4,
-			name: 'Item name',
-			preview: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-			liked: false,
-			price: '575.09'
-		},
-		{
-			id: 5,
-			name: 'Item name',
-			preview: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-			liked: false,
-			price: '575.09'
-		},
-		{
-			id: 6,
-			name: 'Item name',
-			preview: 'https://cdn.vuetifyjs.com/images/cards/sunshine.jpg',
-			liked: false,
-			price: '575.09'
-		}
-	]
+	locations: [],
+	categories: [],
+	liked: 0
 }
 
 const mutations = {
-	RESET_STATE: (state) => {
-		Object.assign(state, {})
+	SET_LOCATIONS: (state, collection) => {
+		Vue.set(state, 'locations', collection)
+	},
+
+	SET_CATEGORIES: (state, collection) => {
+		Vue.set(state, 'categories', collection)
+	},
+
+	SET_LIKED: (state, count) => {
+		Vue.set(state, 'liked', count)
 	}
 }
 
-const actions = {}
+const actions = {
+	async fetchLocations({commit}) {
+		getLocations()
+				.then((querySnapshot) => {
+					const collection = []
+
+					querySnapshot.forEach((doc) => {
+						collection.push(Object.assign({id: doc.id}, doc.data()))
+					})
+
+					commit('SET_LOCATIONS', collection)
+				})
+				.catch(err => {
+					//
+					new ToastNotification({
+						message: err.message,
+						type: ToastNotification.type.error,
+					})
+				})	
+	},
+
+	async fetchCategories({commit}) {
+		getCategories()
+				.then((querySnapshot) => {
+					const collection = []
+
+					querySnapshot.forEach((doc) => {
+						collection.push(Object.assign({id: doc.id}, doc.data()))
+					})
+
+					commit('SET_CATEGORIES', collection)
+				})
+				.catch(err => {
+					//
+					new ToastNotification({
+						message: err.message,
+						type: ToastNotification.type.error,
+					})
+				})
+	},
+	
+	
+	async fetchCountLikedProducts({commit}) {
+		getLikedProducts()
+				.then(snap => {			
+					commit('SET_LIKED', snap.size)
+				})
+		
+	}
+	
+}
 
 export default {
 	namespaced: true,
