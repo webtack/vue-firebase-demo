@@ -64,8 +64,12 @@ const actions = {
 	},
 	
 	
-	async fetchCountLikedProducts({commit}) {
-		getLikedProducts()
+	async fetchCountLikedProducts({commit}, uid) {
+		if(!uid) {
+			return
+		}
+		
+		getLikedProducts(uid)
 				.then(snap => {			
 					commit('SET_LIKED', snap.size)
 				})

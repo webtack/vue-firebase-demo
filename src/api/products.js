@@ -1,3 +1,4 @@
+import store from '@/store'
 import { fireStore } from '@/registerFirebaseConfig'
 
 export function getProducts(filter) {
@@ -17,19 +18,19 @@ export function getProducts(filter) {
 			query = fireStore.collection(collection).where('category', '==', filter.category)
 		} else if(filter.location) {
 			query = fireStore.collection(collection).where('location', '==', filter.location)
-		} else if(filter.liked) {
-			query = fireStore.collection(collection).where('liked', '==', filter.liked)
+		} else if(filter.likedBy) {
+			query = fireStore.collection(collection).where("likedBy", "array-contains", filter.likedBy)
 		}
 	}
 
 	return query.get()
 }
 
-export function getLikedProducts(filter) {
-	const collection = "products"
+export function getLikedProducts(uid) {
+	const collection = "products"		
 	
 	return fireStore.collection(collection)
-			.where('liked', '==', true)
+			.where("likedBy", "array-contains", uid)
 			.get()
 }
 

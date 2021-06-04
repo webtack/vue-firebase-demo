@@ -84,6 +84,9 @@ export default {
         },
         title() {
 	    	return this.showFilters ? 'Sell list' : 'Favorites'
+        },
+        user() {
+	    	return this.$store.getters.user
         }
     },
 	created() {
@@ -94,7 +97,7 @@ export default {
 			this.loading = true
             
             if(!this.showFilters) {
-				filters = {liked: true}
+				filters = {likedBy: this.user.data.uid}
             }
 
 			getProducts(filters)
@@ -106,7 +109,7 @@ export default {
 						})
 						this.products = null
 						this.products = _.concat([], collection)
-						this.$store.dispatch('products/fetchCountLikedProducts')
+						this.$store.dispatch('products/fetchCountLikedProducts', this.user.data.uid)
 
 						this.loading = false
 					})
@@ -126,11 +129,13 @@ export default {
 		filterHandler(filters) {
 			this.getProducts(filters)
 		},
-		likeHandler(id) {
+		likeHandler(item) {
+			let likedBy = item.likedBy
+            
 			updateProduct({
-				id: id,
+				id: item.id,
 				data: {
-					liked: true
+					likedBy: _.union(likedBy, [this.user.data.uid])
 				}
 			})
 					.then(this.getProducts)
@@ -144,11 +149,21 @@ export default {
 						})
 					})
 		},
-		dislikeHandler(id) {
+		dislikeHandler(item) {
+			let likedBy = []
+            
+            for(const index in item.likedBy) {
+				if(item.likedBy[index] === this.user.data.uid) {
+					continue
+                }
+
+	            likedBy.push(item.likedBy[index])
+            }
+            
 			updateProduct({
-				id: id,
+				id: item.id,
 				data: {
-					liked: false
+					likedBy: likedBy
 				}
 			})
 					.then(this.getProducts)

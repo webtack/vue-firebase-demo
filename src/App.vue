@@ -37,9 +37,8 @@ export default {
     },
     created() {
 		this.$store.dispatch('products/fetchLocations')
-		this.$store.dispatch('products/fetchCategories')
-		this.$store.dispatch('products/fetchCountLikedProducts')
-    }
+		this.$store.dispatch('products/fetchCategories') 
+    },
 }
 </script>
 

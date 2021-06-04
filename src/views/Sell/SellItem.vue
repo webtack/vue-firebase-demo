@@ -10,7 +10,8 @@
         <v-card-text style="position: relative">
             <div class="sell-item__favorite">
                 <sell-favorite-action
-                    :liked="item.liked"
+                    v-if="user.data"
+                    :liked="isLiked"
                     @onClick="likeHandler"
                 ></sell-favorite-action>
             </div>
@@ -41,14 +42,26 @@ export default {
 		},
 		locations() {
 			return this.$store.getters.locations
-		}
+		},
+        isLiked() {
+			for (const index in this.item.likedBy) {
+				if(this.item.likedBy[index] === this.user.data.uid) {
+					return true
+                }			
+            }
+			
+			return false
+        },
+        user() {
+			return this.$store.getters.user
+        }
 	},
     methods: {
 	    likeHandler() {
-	    	if(this.item.liked) {
-	    		this.$emit('dislike', this.item.id)
+	    	if(this.isLiked) {
+	    		this.$emit('dislike', this.item)
             } else {
-			    this.$emit('like', this.item.id)
+			    this.$emit('like', this.item)
             }
         },
         resolveLocation(id) {

@@ -15,7 +15,12 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig)
 
 firebase.auth().onAuthStateChanged(user => {
-	store.dispatch("user/fetchUser", user);
+	store.dispatch("user/fetchUser", user)
+	
+	if(user) {
+		store.dispatch("products/fetchCountLikedProducts", user.uid)
+	}
+	
 })
 
 export const fireStore = firebase.firestore()
