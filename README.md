@@ -1,6 +1,7 @@
 # vue-firebase-demo
+#### The demo project that povered by [vueJs v2](https://vuejs.org) with [google firebase](https://firebase.google.com)
 
-## Projec demo
+## Project demo
 ### You can see [live demo](https://bit.ly/34QBlWk) of the project
 
 ## Project setup
